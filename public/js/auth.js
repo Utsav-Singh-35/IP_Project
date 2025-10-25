@@ -159,6 +159,24 @@ class Auth {
     document.getElementById('registerScreen').style.display = 'none';
     document.getElementById('mainApp').style.display = 'block';
     this.applyRoleVisibility();
+    if (window.innerWidth <= 768) {
+      const sidebar = document.querySelector('.sidebar');
+      if (sidebar && !sidebar.classList.contains('open')) {
+        sidebar.classList.add('open');
+        if (!document.getElementById('sidebarBackdrop')) {
+          const backdrop = document.createElement('div');
+          backdrop.id = 'sidebarBackdrop';
+          backdrop.className = 'sidebar-backdrop';
+          backdrop.addEventListener('click', () => {
+            sidebar.classList.remove('open');
+            backdrop.remove();
+            document.body.classList.remove('no-scroll');
+          });
+          document.body.appendChild(backdrop);
+          document.body.classList.add('no-scroll');
+        }
+      }
+    }
   }
 
   updateUserInfo() {

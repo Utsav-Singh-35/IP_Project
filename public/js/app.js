@@ -16,6 +16,12 @@ class App {
     document.getElementById('sidebarToggle').addEventListener('click', () => {
       this.toggleSidebar();
     });
+    const headerToggle = document.getElementById('headerSidebarToggle');
+    if (headerToggle) {
+      headerToggle.addEventListener('click', () => {
+        this.toggleSidebar();
+      });
+    }
 
     // Menu navigation
     document.querySelectorAll('.menu-item').forEach(item => {
@@ -63,7 +69,7 @@ class App {
     // Handle browser back/forward
     window.addEventListener('popstate', (e) => {
       const page = e.state?.page || 'dashboard';
-      this.navigateToPage(page, false);
+      this.navigateToPage(page, false, false);
     });
 
     // Set initial state
@@ -90,7 +96,7 @@ class App {
     }
   }
 
-  navigateToPage(page, updateHistory = true) {
+  navigateToPage(page, updateHistory = true, closeSidebarMobile = false) {
     // Page-level guard (e.g., users -> admin only)
     const pageRoles = {
       users: ['admin']
@@ -126,8 +132,8 @@ class App {
     // Load page-specific data
     this.loadPageData(page);
 
-    // Close sidebar on mobile
-    if (window.innerWidth <= 768) {
+    // Close sidebar on mobile only when explicitly requested (e.g., after a menu click)
+    if (closeSidebarMobile && window.innerWidth <= 768) {
       this.closeSidebar();
     }
   }
@@ -203,7 +209,29 @@ class App {
   toggleSidebar() {
     const sidebar = document.querySelector('.sidebar');
     const mainContent = document.querySelector('.main-content');
-    
+
+    // On mobile, use `.open` to slide in the sidebar (CSS controls default hidden state)
+    if (window.innerWidth <= 768) {
+      const willOpen = !sidebar.classList.contains('open');
+      sidebar.classList.toggle('open');
+
+      // Manage backdrop and body scroll when sidebar is open
+      if (willOpen) {
+        const backdrop = document.createElement('div');
+        backdrop.id = 'sidebarBackdrop';
+        backdrop.className = 'sidebar-backdrop';
+        backdrop.addEventListener('click', () => this.closeSidebar());
+        document.body.appendChild(backdrop);
+        document.body.classList.add('no-scroll');
+      } else {
+        const backdrop = document.getElementById('sidebarBackdrop');
+        if (backdrop) backdrop.remove();
+        document.body.classList.remove('no-scroll');
+      }
+      return;
+    }
+
+    // On desktop, collapse sidebar and expand main content
     sidebar.classList.toggle('collapsed');
     mainContent.classList.toggle('expanded');
   }
@@ -211,7 +239,15 @@ class App {
   closeSidebar() {
     const sidebar = document.querySelector('.sidebar');
     const mainContent = document.querySelector('.main-content');
-    
+
+    if (window.innerWidth <= 768) {
+      sidebar.classList.remove('open');
+      const backdrop = document.getElementById('sidebarBackdrop');
+      if (backdrop) backdrop.remove();
+      document.body.classList.remove('no-scroll');
+      return;
+    }
+
     sidebar.classList.add('collapsed');
     mainContent.classList.add('expanded');
   }
@@ -231,10 +267,17 @@ class App {
 
   handleResize() {
     // Close sidebar on mobile when resizing to desktop
+    const sidebar = document.querySelector('.sidebar');
+    const mainContent = document.querySelector('.main-content');
+
     if (window.innerWidth > 768) {
-      const sidebar = document.querySelector('.sidebar');
-      const mainContent = document.querySelector('.main-content');
-      
+      // Reset mobile state
+      sidebar.classList.remove('open');
+      // Ensure desktop default (sidebar visible, content not expanded)
+      sidebar.classList.remove('collapsed');
+      mainContent.classList.remove('expanded');
+    } else {
+      // On entering mobile, ensure desktop-only classes are cleared
       sidebar.classList.remove('collapsed');
       mainContent.classList.remove('expanded');
     }

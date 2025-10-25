@@ -337,6 +337,11 @@
     font-size: 1.5rem;
   }
   
+  /* Reduce chart height on tablets/large phones */
+  #salesTrendChart {
+    max-height: 240px;
+  }
+  
   .card-content {
     padding: var(--spacing-md);
   }
@@ -369,6 +374,11 @@
   .top-item {
     flex-direction: column;
     text-align: center;
+  }
+  
+  /* Reduce chart height on small phones */
+  #salesTrendChart {
+    max-height: 200px;
   }
   
   .recent-item-meta,

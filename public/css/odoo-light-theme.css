@@ -354,6 +354,17 @@ input:disabled, select:disabled, textarea:disabled {
   .data-table td {
     padding: var(--spacing-sm);
   }
+
+  /* Enable horizontal scroll for wide tables on mobile */
+  .table-container {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* Prevent columns from squishing too much */
+  .data-table {
+    min-width: 720px;
+  }
 }
 
 /* Loading States */
