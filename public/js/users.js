@@ -64,7 +64,7 @@ class UsersPage {
   userFormHTML(user = {}) {
     const role = user.role || 'staff';
     return `
-      <div style="display:grid;grid-template-columns:1fr 340px;gap:16px;align-items:start;">
+      <div class="user-edit-grid" style="gap:16px;align-items:start;">
         <form id="userForm" class="inventory-form" style="grid-template-columns:1fr;">
           <div class="form-section" style="margin:0;">
             <div class="form-row">

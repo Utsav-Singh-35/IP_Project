@@ -1,3 +1,14 @@
+/* Users edit modal grid */
+.user-edit-grid {
+  display: grid;
+  grid-template-columns: 1fr 340px;
+}
+
+@media (max-width: 1200px) {
+  .user-edit-grid {
+    grid-template-columns: 1fr;
+  }
+}
 /* Login Screen */
 .login-container {
   min-height: 100vh;
@@ -378,7 +389,8 @@
   box-shadow: var(--shadow-lg);
   max-width: 90vw;
   max-height: 90vh;
-  overflow: hidden;
+  display: flex;
+  flex-direction: column;
   animation: fadeIn var(--transition-normal);
 }
 
@@ -411,8 +423,9 @@
 
 .modal-body {
   padding: var(--spacing-lg);
-  max-height: none;
-  overflow-y: visible;
+  flex: 1 1 auto;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
 .modal-footer {
