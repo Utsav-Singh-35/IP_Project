@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Frontend Auth Test</title>
+</head>
+<body>
+    <h1>Frontend Authentication Test</h1>
+    <div id="status"></div>
+    <button onclick="testLogin()">Test Login</button>
+    <button onclick="testPurchases()">Test Purchases</button>
+    <button onclick="clearToken()">Clear Token</button>
+    
+    <script>
+        const API_BASE_URL = window.location.origin + '/api';
+        
+        async function request(endpoint, options = {}) {
+            const url = `${API_BASE_URL}${endpoint}`;
+            const token = localStorage.getItem('token');
+            
+            const defaultOptions = {
+                headers: {
+                    'Content-Type': 'application/json',
+                    ...(token && { 'Authorization': `Bearer ${token}` })
+                }
+            };
+
+            const config = {
+                ...defaultOptions,
+                ...options,
+                headers: {
+                    ...defaultOptions.headers,
+                    ...options.headers
+                }
+            };
+
+            try {
+                const response = await fetch(url, config);
+                
+                if (!response.ok) {
+                    const errorData = await response.json().catch(() => ({}));
+                    const err = new Error(errorData.message || `HTTP error! status: ${response.status}`);
+                    err.data = errorData;
+                    throw err;
+                }
+
+                return await response.json();
+            } catch (error) {
+                console.error('API request failed:', error);
+                throw error;
+            }
+        }
+        
+        async function testLogin() {
+            try {
+                const credentials = {
+                    email: 'admin@example.com',
+                    password: 'Password123!'
+                };
+                
+                const response = await request('/auth/login', {
+                    method: 'POST',
+                    body: JSON.stringify(credentials)
+                });
+                
+                localStorage.setItem('token', response.token);
+                document.getElementById('status').innerHTML = 'Login successful! Token stored.';
+                console.log('Login response:', response);
+            } catch (error) {
+                document.getElementById('status').innerHTML = 'Login failed: ' + error.message;
+                console.error('Login error:', error);
+            }
+        }
+        
+        async function testPurchases() {
+            try {
+                const response = await request('/purchases');
+                document.getElementById('status').innerHTML = `Purchases loaded: ${response.purchases.length} items`;
+                console.log('Purchases response:', response);
+            } catch (error) {
+                document.getElementById('status').innerHTML = 'Purchases failed: ' + error.message;
+                console.error('Purchases error:', error);
+            }
+        }
+        
+        function clearToken() {
+            localStorage.removeItem('token');
+            document.getElementById('status').innerHTML = 'Token cleared';
+        }
+    </script>
+</body>
+</html>

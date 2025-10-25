@@ -1,0 +1,533 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Inventory Management System</title>
+    <link rel="stylesheet" href="css/odoo-light-theme.css">
+    <link rel="stylesheet" href="css/components.css">
+    <link rel="stylesheet" href="css/dashboard.css">
+    <link rel="stylesheet" href="css/inventory.css">
+    <link rel="stylesheet" href="css/suppliers.css">
+    <link rel="stylesheet" href="css/purchases.css">
+    <link rel="stylesheet" href="css/analytics.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+      .login-container { display: flex; align-items: center; justify-content: center; min-height: 100vh; padding: 24px; }
+      .login-card { width: 100%; max-width: 400px; margin: 0 auto; }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <!-- Login Screen -->
+    <div id="loginScreen" class="login-container">
+        <div class="login-card">
+            <div class="login-header">
+                <div class="logo">
+                    <i class="fas fa-boxes"></i>
+                    <h1>Smart Inventory</h1>
+                </div>
+                <p>Management System</p>
+            </div>
+            <form id="loginForm" class="login-form">
+                <div class="form-group">
+                    <label for="email">Email Address</label>
+                    <input type="email" id="email" name="email" required>
+                </div>
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" name="password" required>
+                </div>
+                <button type="submit" class="btn btn-primary btn-full">
+                    <i class="fas fa-sign-in-alt"></i>
+                    Sign In
+                </button>
+            </form>
+            <div class="login-footer">
+                <p>Don't have an account? <a href="#" id="registerLink">Register here</a></p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Register Screen -->
+    <div id="registerScreen" class="login-container" style="display: none;">
+        <div class="login-card">
+            <div class="login-header">
+                <div class="logo">
+                    <i class="fas fa-boxes"></i>
+                    <h1>Smart Inventory</h1>
+                </div>
+                <p>Create Account</p>
+            </div>
+            <form id="registerForm" class="login-form">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="regFirstName">First Name</label>
+                        <input type="text" id="regFirstName" name="firstName" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="regLastName">Last Name</label>
+                        <input type="text" id="regLastName" name="lastName" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="regUsername">Username</label>
+                    <input type="text" id="regUsername" name="username" required>
+                </div>
+                <div class="form-group">
+                    <label for="regEmail">Email Address</label>
+                    <input type="email" id="regEmail" name="email" required>
+                </div>
+                <div class="form-group">
+                    <label for="regPassword">Password</label>
+                    <input type="password" id="regPassword" name="password" required>
+                </div>
+                <button type="submit" class="btn btn-primary btn-full">
+                    <i class="fas fa-user-plus"></i>
+                    Create Account
+                </button>
+            </form>
+            <div class="login-footer">
+                <p>Already have an account? <a href="#" id="loginLink">Sign in here</a></p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Application -->
+    <div id="mainApp" style="display: none;">
+        <!-- Sidebar -->
+        <nav class="sidebar">
+            <div class="sidebar-header">
+                <div class="logo">
+                    <i class="fas fa-boxes"></i>
+                    <span>Smart Inventory</span>
+                </div>
+                <button class="sidebar-toggle" id="sidebarToggle">
+                    <i class="fas fa-bars"></i>
+                </button>
+            </div>
+            <ul class="sidebar-menu">
+                <li class="menu-item active" data-page="dashboard">
+                    <a href="#dashboard">
+                        <i class="fas fa-tachometer-alt"></i>
+                        <span>Dashboard</span>
+                    </a>
+                </li>
+                <li class="menu-item" data-page="inventory">
+                    <a href="#inventory">
+                        <i class="fas fa-boxes"></i>
+                        <span>Inventory</span>
+                    </a>
+                </li>
+                <li class="menu-item" data-page="suppliers">
+                    <a href="#suppliers">
+                        <i class="fas fa-truck"></i>
+                        <span>Suppliers</span>
+                    </a>
+                </li>
+                <li class="menu-item" data-page="purchases">
+                    <a href="#purchases">
+                        <i class="fas fa-shopping-cart"></i>
+                        <span>Purchases</span>
+                    </a>
+                </li>
+                <li class="menu-item" data-page="analytics">
+                    <a href="#analytics">
+                        <i class="fas fa-chart-line"></i>
+                        <span>Analytics</span>
+                    </a>
+                </li>
+                <li class="menu-item" data-page="users" data-roles="admin">
+                    <a href="#users">
+                        <i class="fas fa-users-cog"></i>
+                        <span>Users</span>
+                    </a>
+                </li>
+            </ul>
+            <div class="sidebar-footer">
+                <div class="user-info">
+                    <div class="user-avatar">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <div class="user-details">
+                        <span class="user-name" id="userName">John Doe</span>
+                        <span class="user-role" id="userRole">Manager</span>
+                    </div>
+                </div>
+                <button class="btn btn-secondary btn-sm" id="logoutBtn">
+                    <i class="fas fa-sign-out-alt"></i>
+                    Logout
+                </button>
+            </div>
+        </nav>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Header -->
+            <header class="header">
+                <div class="header-left">
+                    <h1 id="pageTitle">Dashboard</h1>
+                    <div class="breadcrumb" id="breadcrumb">
+                        <span>Home</span>
+                        <i class="fas fa-chevron-right"></i>
+                        <span>Dashboard</span>
+                    </div>
+                </div>
+                <div class="header-right">
+                    <div class="notifications">
+                        <button class="notification-btn" id="notificationBtn">
+                            <i class="fas fa-bell"></i>
+                            <span class="notification-badge" id="notificationBadge">3</span>
+                        </button>
+                    </div>
+                    <div class="search-box">
+                        <input type="text" placeholder="Search inventory..." id="globalSearch">
+                        <i class="fas fa-search"></i>
+                    </div>
+                </div>
+            </header>
+
+                <script>
+                    // Global role-based UI helper: hide elements with data-roles if current user role not included
+                    (async function applyRoleUI() {
+                        function hideElements(role) {
+                            document.querySelectorAll('[data-roles]').forEach(el => {
+                                const allowed = (el.getAttribute('data-roles') || '').split(',').map(s => s.trim()).filter(Boolean);
+                                if (allowed.length && !allowed.includes(role)) {
+                                    el.style.display = 'none';
+                                } else {
+                                    // leave default
+                                }
+                            });
+                        }
+
+                        try {
+                            let role = null;
+                            if (window.auth && typeof window.auth.getCurrentUser === 'function') {
+                                const u = window.auth.getCurrentUser();
+                                if (u && u.role) role = u.role;
+                            }
+                            if (!role) {
+                                try {
+                                    const resp = await API.getCurrentUser();
+                                    role = resp?.user?.role;
+                                } catch (e) {
+                                    role = null;
+                                }
+                            }
+                            if (role) hideElements(role);
+                        } catch (err) {
+                            // silently fail
+                        }
+                    })();
+                </script>
+
+            <!-- Page Content -->
+            <div class="page-content">
+                <!-- Dashboard Page -->
+                <div id="dashboardPage" class="page active">
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-icon">
+                                <i class="fas fa-boxes"></i>
+                            </div>
+                            <div class="stat-content">
+                                <h3 id="totalItems">0</h3>
+                                <p>Total Items</p>
+                            </div>
+                        </div>
+                        <div class="stat-card warning">
+                            <div class="stat-icon">
+                                <i class="fas fa-exclamation-triangle"></i>
+                            </div>
+                            <div class="stat-content">
+                                <h3 id="lowStockItems">0</h3>
+                                <p>Low Stock</p>
+                            </div>
+                        </div>
+                        <div class="stat-card error">
+                            <div class="stat-icon">
+                                <i class="fas fa-times-circle"></i>
+                            </div>
+                            <div class="stat-content">
+                                <h3 id="outOfStockItems">0</h3>
+                                <p>Out of Stock</p>
+                            </div>
+                        </div>
+                        <div class="stat-card success">
+                            <!-- <div class="stat-icon">
+                                <i class="fas fa-dollar-sign"></i>
+                            </div> -->
+                            <div class="stat-content">
+                                <h3 id="inventoryValue">$0</h3>
+                                <p>Inventory Value</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="dashboard-grid">
+                        <div class="dashboard-card">
+                            <div class="card-header">
+                                <h3>Recent Purchases</h3>
+                                <a href="#purchases" class="btn btn-sm btn-secondary">View All</a>
+                            </div>
+                            <div class="card-content">
+                                <div id="recentPurchases" class="recent-list">
+                                    <!-- Recent purchases will be loaded here -->
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="dashboard-card">
+                            <div class="card-header">
+                                <h3>Top Selling Items</h3>
+                                <a href="#inventory" class="btn btn-sm btn-secondary">View All</a>
+                            </div>
+                            <div class="card-content">
+                                <div id="topSellingItems" class="top-items">
+                                    <!-- Top selling items will be loaded here -->
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="dashboard-card full-width">
+                            <div class="card-header">
+                                <h3>Sales Trends</h3>
+                                <div class="chart-controls">
+                                    <select id="trendPeriod">
+                                        <option value="7">Last 7 days</option>
+                                        <option value="30" selected>Last 30 days</option>
+                                        <option value="90">Last 90 days</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="card-content">
+                                <canvas id="salesTrendChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Inventory Page -->
+                <div id="inventoryPage" class="page">
+                    <div class="page-header">
+                        <div class="page-actions">
+                            <button class="btn btn-primary" id="addInventoryBtn" data-roles="admin,manager">
+                                <i class="fas fa-plus"></i>
+                                Add Item
+                            </button>
+                            <button class="btn btn-secondary" id="exportInventoryBtn">
+                                <i class="fas fa-download"></i>
+                                Export
+                            </button>
+                        </div>
+                        <div class="page-filters">
+                            <select id="categoryFilter">
+                                <option value="">All Categories</option>
+                            </select>
+                            <select id="statusFilter">
+                                <option value="">All Status</option>
+                                <option value="active">Active</option>
+                                <option value="inactive">Inactive</option>
+                            </select>
+                            <input type="text" id="inventorySearch" placeholder="Search items...">
+                        </div>
+                    </div>
+                    <div class="table-container">
+                        <table class="data-table" id="inventoryTable">
+                            <thead>
+                                <tr>
+                                    <th>SKU</th>
+                                    <th>Name</th>
+                                    <th>Category</th>
+                                    <th>Stock</th>
+                                    <th>Price</th>
+                                    <th>Supplier</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- Inventory items will be loaded here -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Suppliers Page -->
+                <div id="suppliersPage" class="page">
+                    <div class="page-header">
+                        <div class="page-actions">
+                            <button class="btn btn-primary" id="addSupplierBtn" data-roles="admin,manager">
+                                <i class="fas fa-plus"></i>
+                                Add Supplier
+                            </button>
+                        </div>
+                        <div class="page-filters">
+                            <select id="supplierStatusFilter">
+                                <option value="">All Status</option>
+                                <option value="active">Active</option>
+                                <option value="inactive">Inactive</option>
+                            </select>
+                            <input type="text" id="supplierSearch" placeholder="Search suppliers...">
+                        </div>
+                    </div>
+                    <div class="table-container">
+                        <table class="data-table" id="suppliersTable">
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Contact Person</th>
+                                    <th>Email</th>
+                                    <th>Phone</th>
+                                    <th>Rating</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- Suppliers will be loaded here -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Purchases Page -->
+                <div id="purchasesPage" class="page">
+                    <div class="page-header">
+                        <div class="page-actions">
+                            <button class="btn btn-primary" id="addPurchaseBtn" data-roles="admin,manager">
+                                <i class="fas fa-plus"></i>
+                                New Purchase
+                            </button>
+                            <button class="btn btn-secondary" id="reorderSuggestionsBtn">
+                                <i class="fas fa-lightbulb"></i>
+                                Reorder Suggestions
+                            </button>
+                        </div>
+                        <div class="page-filters">
+                            <select id="purchaseStatusFilter">
+                                <option value="">All Status</option>
+                                <option value="pending">Pending</option>
+                                <option value="ordered">Ordered</option>
+                                <option value="received">Received</option>
+                                <option value="cancelled">Cancelled</option>
+                            </select>
+                            <input type="text" id="purchaseSearch" placeholder="Search purchases...">
+                        </div>
+                    </div>
+                    <div class="table-container">
+                        <table class="data-table" id="purchasesTable">
+                            <thead>
+                                <tr>
+                                    <th>Purchase #</th>
+                                    <th>Supplier</th>
+                                    <th>Items</th>
+                                    <th>Total</th>
+                                    <th>Status</th>
+                                    <th>Order Date</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- Purchases will be loaded here -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Users Page (Admin only) -->
+                <div id="usersPage" class="page" data-roles="admin">
+                    <div class="page-header">
+                        <div class="page-actions">
+                            <button class="btn btn-primary" id="addUserBtn" data-roles="admin">
+                                <i class="fas fa-user-plus"></i>
+                                Add User
+                            </button>
+                        </div>
+                        <div class="page-filters">
+                            <input type="text" id="userSearch" placeholder="Search users...">
+                        </div>
+                    </div>
+                    <div class="table-container">
+                        <table class="data-table" id="usersTable">
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Username</th>
+                                    <th>Email</th>
+                                    <th>Role</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- Users will be loaded here -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Analytics Page -->
+                <div id="analyticsPage" class="page">
+                    <div class="analytics-grid">
+                        <div class="analytics-card">
+                            <div class="card-header">
+                                <h3>Inventory Turnover</h3>
+                            </div>
+                            <div class="card-content">
+                                <canvas id="turnoverChart" style="height: 420px;"></canvas>
+                            </div>
+                        </div>
+
+                        <div class="analytics-card">
+                            <div class="card-header">
+                                <h3>Category Analysis</h3>
+                            </div>
+                            <div class="card-content">
+                                <canvas id="categoryChart" style="height: 420px;"></canvas>
+                            </div>
+                        </div>
+
+                        <div class="analytics-card">
+                            <div class="card-header">
+                                <h3>Supplier Performance</h3>
+                            </div>
+                            <div class="card-content">
+                                <canvas id="supplierChart" style="height: 420px;"></canvas>
+                            </div>
+                        </div>
+
+                        <div class="analytics-card full-width">
+                            <div class="card-header">
+                                <h3>Low Stock Alerts</h3>
+                            </div>
+                            <div class="card-content">
+                                <div id="alertsList" class="alerts-list">
+                                    <!-- Alerts will be loaded here -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Modals -->
+    <div id="modalOverlay" class="modal-overlay">
+        <!-- Modals will be dynamically created here -->
+    </div>
+
+    <!-- Scripts -->
+    <script src="js/api.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/dashboard.js"></script>
+    <script src="js/inventory.js"></script>
+    <script src="js/suppliers.js"></script>
+    <script src="js/purchases.js"></script>
+    <script src="js/analytics.js"></script>
+    <script src="js/users.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>
