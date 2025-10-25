@@ -491,6 +491,11 @@ body.no-scroll {
     margin: var(--spacing-md);
     max-width: calc(100vw - 2rem);
   }
+
+  /* Move logout button upward by ~100px on mobile */
+  .sidebar-footer {
+    margin-bottom: 100px;
+  }
 }
 
 @media (max-width: 480px) {
